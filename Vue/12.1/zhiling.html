@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>指令</title>
+    <script src="vue.js"></script>
+</head>
+<style>
+    .box{
+        width: 200px;
+        height: 200px;
+        background: gold;
+    }
+    .box1{
+        width: 200px;
+        height: 200px;
+        background: darkcyan;
+    }
+</style>
+<body>
+<div id="app">
+    <h2>v-text 给元素绑定文本内容</h2>
+        <ul>
+            <li> {{msg}} </li>
+            <li v-text="msg"></li>
+        </ul>
+    <h2>v-html 识别数据中包含的html标签</h2>
+        <ul>
+            <li v-html="titlemsg"></li>
+        </ul>
+    <h2>v-model 表单元素双向绑定</h2>
+        <input type="text" v-model="msg">
+        <div>{{msg}}</div>
+    <h2>v-if 根据表达式真假值来判断条件</h2>
+        <input type="checkbox" v-model="flag">
+        <div>{{flag}}</div>
+        <div class="box" v-if="flag" ></div>
+    <h2>v-show 执行显示隐藏的元素 无论真假都会被渲染 display:block/none</h2>
+        <input type="checkbox" v-model="flagShow">
+        <div>{{flagShow}}</div>
+        <div class="box1" v-show="flagShow" ></div>
+
+</div>
+<script>
+    new Vue({
+        el:"#app",
+        data:{
+            msg: 'hello',
+            titlemsg:"<i>这是倾斜标签i</i>",
+            flag:true,
+            flagShow:true
+        }
+    })
+</script>
+</body>
+</html>

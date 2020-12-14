@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>组件通信</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="../vue.js"></script>
+</head>
+<style>
+    #app{
+        width: 80%;
+        margin: auto;
+    }
+</style>
+<body>
+
+<div id="app">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">todoList</h3>
+        </div>
+        <div class="panel-body">
+            <my-list :title="title" :content="todoList"></my-list>
+            <my-list  :content="todoList"></my-list>
+        </div>
+    </div>
+
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <h3 class="panel-title">管理面板</h3>
+        </div>
+        <div class="panel-body">
+<!--            <my-list title="学生列表" :content="students"></my-list>-->
+        </div>
+    </div>
+</div>
+
+<script type="text/x-template" id="myList">
+    <div>
+<!--        <h1  @click="changeMSG">{{msg}}</h1>-->
+        <h3 v-if="title">{{title}}</h3>
+        <!--    渲染内容-->
+        <ul class="list-group">
+            <li class="list-group-item" v-for="item in content">
+               {{item.title}}  <button class="btn btn-danger">删除</button>
+            </li>
+        </ul>
+    </div>
+</script>
+
+<script>
+    Vue.component('my-list',{
+        template:"#myList",
+        // props:['title','content'],
+        // data(){
+        //     return {
+        //         msg:"这是子组件数据"
+        //     }
+        // },
+        // methods: {
+        //     changeMSG(){
+        //         this.msg = '子组件更改的数据';
+        //     },
+        //
+        // }
+
+
+        //要给传入的插值设置规则时{}
+        props:{
+            title:{
+                type:String,
+                default:'hello title default'
+            },
+            content:{
+                type:Array,
+                required:true
+            }
+        }
+    })
+
+    //实例创建vue
+    let vm = new Vue({
+        el:"#app",
+        data:{
+            message:'第一个内容',
+            todoList:[],
+            students:[
+                {id:3,title:'张三'},
+                {id:4,title:'李四'}
+            ],
+            title:'hello title'
+        },
+        methods:{
+            initTodoList(){
+                let data = localStorage.getItem(this.todoList);
+                if(data){
+                    this.todoList = JSON.parse(data);
+                }else {
+                    this.todoList = [
+                        {id:1,title: '第一个列表',status: false},
+                        {id:2,title: '第二个列表',status: true}
+                    ]
+                }
+            },
+            //子组件给父组件传递参数
+
+        },
+        mounted(){
+            this.initTodoList();
+        }
+
+    })
+</script>
+</body>
+</html>

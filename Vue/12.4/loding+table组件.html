@@ -1,0 +1,325 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>loading+table组件</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="../vue.js"></script>
+</head>
+<style>
+    ul,li{
+        list-style: none;
+    }
+    .box{
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: rgba(217,237,247,.8);
+        z-index: 999;
+    }
+    .box ul{
+        width: 300px;
+        height: 50px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        overflow: hidden;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+    }
+    .box ul>li{
+        float: left;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #629A9C;
+        margin-left: 5px;
+    }
+    .box ul>li:first-child{
+        animation: loadingL 0.5s 0s infinite;
+    }
+    .box ul>li:nth-of-type(2){
+        animation: loadingL 0.5s 0.1s infinite;
+    }
+    .box ul>li:nth-of-type(3){
+        animation: loadingL 0.5s 0.2s infinite;
+    }
+    .box ul>li:nth-of-type(4){
+        animation: loadingL 0.5s 0.3s infinite;
+    }
+    .box ul>li:nth-of-type(5){
+        animation: loadingL 0.5s 0.4s infinite;
+    }
+    @keyframes loadingL {
+        50% {
+            transform: translateY(-20px);
+        }
+        100% {
+            transform: translateY(0);
+        }
+    }
+
+</style>
+<body>
+<div id="app">
+    <!--current 将当前页数动态赋值给current-->
+    <!--@pagechange事件 点击按钮时切换页数 自定义事件 用于子组件向父组件传递数据-->
+    <my-paging :total="total" :limit="limit" :current="page" @pagechange="changePage"></my-paging>
+    <page-limit :num="total" @limitchange="changeLimit"></page-limit>
+    <br>
+    <loading-mask :issshow="show"></loading-mask>
+    <my-table :data="currentData" :head="thead"></my-table>
+</div>
+<!--loading遮罩层-->
+<script type="text/x-template" id="loadingMask">
+    <div class="box" v-show="issshow">
+        <ul>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
+</script>
+
+<!--数据渲染表格-->
+<script type="text/x-template" id="table">
+    <table class="table">
+        <thead>
+            <tr class="info">
+                <th v-for="item in head">{{item.title}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="item in data">
+                <!--绑定标题栏顺序-->
+                <td v-for="value in head">{{item[value.filed]}}</td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+
+<!--分页-->
+<script type="text/x-template" id="paging">
+    <div class="col-xs-4">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li>
+                    <a @click="prePage" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <!--
+                     类名显示  {}  对象主要解决   是否添加类名
+                             []   数组主要解决  两个类名之间的切换
+                     pages  所有的页数  有多少页就显示多少分页
+                     click  子组件点击事件，将页数传进去 由子组件向父组件传递 将点击的页数告诉父组件
+                -->
+                <li :class="{active : current==item}" @click="clickPage(item)"  v-for="item in pages"><a>{{item}}</a></li>
+                <li>
+                    <a @click="nextPage" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+    </div>
+</script>
+
+<!--选择一页选择展示的条数-->
+<template id="pageLimit">
+    <div class="col-xs-3">
+        <select class="form-control" @click="clickLimit(nowNum)" v-model="nowNum">
+            <option value="">请选择页面中显示的数量</option>
+            <option :value="v" v-for="v of num">{{v}}</option>
+        </select>
+    </div>
+</template>
+</body>
+<script>
+    //loading遮罩层
+    Vue.component('loading-mask',{
+        template:"#loadingMask",
+        props:{
+            issshow:{
+                type:Boolean,
+                default:false
+            }
+        }
+    })
+    //加载学生数据表格
+    Vue.component('my-table',{
+        template: "#table",
+        props: {
+            data:{
+                type: Array,
+                required: true
+            },
+            head:{
+                type: Array,
+                required: true
+            }
+        }
+    })
+    //分页
+    Vue.component('my-paging',{
+        template:"#paging",
+        props:{
+            //页数
+            // page:{
+            //     type: Number,
+            //     default: 1
+            // },
+            //当前页数显示的条数
+            limit:{
+                type: Number,
+                default: 2
+            },
+            //总条数
+            total:{
+                type: Number,
+                required:true
+            },
+            //当前的页数
+            current:{
+                type: Number,
+                default: 1
+            }
+        },
+        computed:{
+            //计算共有多少页
+            pages(){
+                let pages = Math.ceil(this.total / this.limit);
+                return pages;
+            }
+        },
+        // data(){
+        //   return {
+        //
+        //       pagesize:3
+        //   }
+        // },
+        methods:{
+            clickPage(page){
+                //接收子元素传递的数据 触发事件 $emit(触发的事件，要更改的数据)
+                this.$emit('pagechange',page);
+            },
+            //上一页
+            prePage(){
+                //当前页-1是上一页
+                let pre = this.current - 1;
+                //判断上一页是否<=0
+                pre = pre <= 0?this.current:pre;
+                this.$emit('pagechange',pre)
+            },
+            //下一页
+            nextPage(){
+                //当前页+1是下一页
+                let next = this.current + 1;
+                //判断上一页是否<=0
+                next = next >= this.pages?this.pages:next;
+                this.$emit('pagechange',next)
+            }
+        }
+    })
+    /*
+        1.接受数据总数
+        2.传入一页显示条数   可以不传  给默认值
+        3.page  limit  数据  数据总数
+     */
+
+    //选择展示内容多少
+    Vue.component('page-limit',{
+        template:'#pageLimit',
+        props:['num'],
+        data(){
+            return {
+                nowNum:3
+            }
+        },
+        methods:{
+            clickLimit(nowlimit){
+                console.log(nowlimit);
+                this.$emit('limitchange',nowlimit);
+            }
+        }
+    })
+
+
+
+    //实例化创建vue
+    let vm = new Vue({
+        el:"#app",
+        data:{
+            show:true,
+            students:[],
+            thead:[
+                {filed:'id',title:'ID'},
+                {filed:'names',title:'姓名'},
+                {filed:'sex',title:'性别'}
+            ],
+            page:1,
+            limit:3,
+            total:0
+        },
+        //计算属性
+        computed:{
+            currentData(){
+                let data = [];
+                //没有数据直接返回空数组
+                if(!this.students.length){
+                    return data;
+                }
+                //有数据 计算每个页显示的数据
+                let start = (this.page - 1) * this.limit,
+                    end = this.page * this.limit;
+                data = this.students.slice(start,end);
+                return data;
+            }
+        },
+        methods:{
+            initStudents(){
+                this.show=true;
+                let t=setTimeout(()=>{
+                    clearTimeout(t);
+                    this.show=false;
+                    this.students = [
+                        {id:1,names:'张三',sex:'男'},
+                        {id:2,names:'李四',sex:'男'},
+                        {id:3,names:'王五',sex:'男'},
+                        {id:4,names:'赵六',sex:'男'},
+                        {id:5,names:'小红',sex:'女'},
+                        {id:6,names:'小丽',sex:'女'},
+                        {id:7,names:'王麻子',sex:'男'},
+                        {id:8,names:'六六',sex:'女'},
+                    ];
+                    this.total = this.students.length;
+
+                },1000)
+            },
+            //点击页数进行切换
+            //$emit()触发事件后 将页数传递进来，由父组件进行更改 从而改变页数及内容
+            changePage(pages){
+                this.page = pages;
+            },
+            //改变每条显示的数据数
+            changeLimit(limits){
+                this.limit = limits;
+            }
+        },
+        mounted(){
+            this.initStudents();
+        }
+    })
+</script>
+</html>

@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ToDoList</title>
+    <link rel="stylesheet" href="u-reset.css">
+    <link rel="stylesheet" href="index.css">
+    <script src="../vue.js"></script>
+</head>
+<body>
+<!--box-->
+<div id="box" class="box">
+    <!--header start-->
+    <div class="header">
+        <div class="headerCon">
+            <div class="title">
+                ToDoList
+            </div>
+            <input class="ent" type="text" v-model="msg" @keydown.enter="addTodo($event)" placeholder="添加ToDo">
+        </div>
+    </div>
+    <!--header end-->
+
+    <!--content start-->
+    <div class="content">
+        <div class="contentCon">
+            <!--正在进行-->
+            <h2>
+                正在进行
+                <span>{{doingLength}}</span>
+            </h2>
+
+            <add-list :content="todoList"></add-list>
+            <!--完成-->
+            <h2>
+                已经完成
+                <span>{{doneLength}}</span>
+            </h2>
+            <ul class="downList">
+                <li v-for="item in todoList" v-if="item.status">
+                    <input type="checkbox" v-model="item.status">
+                    <p>{{item.content}}</p>
+                    <span class="removeBtn" @click="delTodo(item.id)">-</span>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+    <!--content end-->
+</div>
+
+<script type="text/x-template" id="add">
+    <ul class="todoList">
+        <!--循环语句 v-for-->
+        <li v-for="item in content">
+            <input type="checkbox" v-model="item.status">
+            <p>{{item.content}}</p>
+            <span class="removeBtn" @click="delTodo(item.id)">-</span>
+        </li>
+    </ul>
+</script>
+<script>
+    Vue.component('add-list',{
+        template:"#add",
+        props:['content']
+    })
+
+    let vm=new Vue({
+        el:'#box',
+        data:{
+          todoList: [],
+          msg:'',
+          status: false,
+          tId:0
+        },
+        //计算属性 --- 当模板比较复杂时--为了减轻模板
+        //数据量大，需要缓存时
+        computed:{
+            //完成
+            doneLength(){
+                if(!this.todoList.length){
+                    return 0;
+                }
+                let len = this.todoList.filter(ele=>ele.status).length;
+                return len;
+            },
+            //未完成
+            doingLength(){
+                if(!this.todoList.length){
+                    return 0;
+                }
+                let len = this.todoList.filter(ele=>!ele.status).length;
+                return len;
+            }
+        },
+        //不需要缓存  每次都会计算
+        methods:{
+            //初始化
+            initTodoList(){
+                let data = localStorage.getItem(this.todoList);
+                if(data){
+                    this.todoList = JSON.parse(data);
+                }else{
+                    this.todoList = [
+                        {id:this.tId,content: this.msg,status: this.status}
+                    ]
+                }
+            },
+            //es6函数简写
+            addTodo(e){
+                e.preventDefault();
+                this.tId++;
+                //this指向vue   id自增
+                this.todoList.push({id:this.tId,content: this.msg,status: this.status});
+                localStorage.setItem(this.tId, this.todoList);
+                this.msg='';
+            },
+            delTodo(id){
+                // console.log(id)
+                //filter()函数是将序列的每一个元素都作用于传入的函数，然后根据返回值为True的保留。
+                this.todoList = this.todoList.filter(ele=>ele.id!=id);
+            }
+
+        },
+
+        //挂载数据 --- 操作DOM 渲染页面  获取元素
+        mounted(){
+            this.initTodoList();
+            //获取本地数据
+            let todo = localStorage.getItem('todoList');
+            // console.log(this.todoList.id)
+            if(todo){
+                todo = JSON.parse(todo);
+                // console.log(todoList);
+                this.todoList = todo;
+            }
+        },
+        //监听
+        watch:{
+            //要监听的对象
+            todoList:{
+                //操作
+                handler(newv){
+                    localStorage.setItem('todoList',JSON.stringify(newv))
+                },
+                deep:true
+            }
+        }
+    })
+
+
+</script>
+</body>
+</html>

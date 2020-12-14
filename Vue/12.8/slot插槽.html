@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>vue插槽</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="../vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <panel-list :data="students">
+        <template #btns="btns">
+            <!--获取到对应的id--作用于函数-->
+            <button class="btn btn-info" @click="deleteList(btns.ids)">按钮</button>
+        </template>
+    </panel-list>
+</div>
+<script type="text/x-template" id="panel">
+    <ul class="list-primary">
+        <li v-for="item in data">
+            {{item.name}}
+            <slot name="btns" :ids="item.id"></slot>
+        </li>
+    </ul>
+</script>
+
+<script>
+    Vue.component('panel-list',{
+        template:"#panel",
+        props:{
+            data:{
+                type:Array,
+                required:true
+            }
+        }
+    })
+//分发内容   将内容放置到指定的位置   slot标签
+    let vm = new Vue({
+        el:"#app",
+        data:{
+            students:[
+                {id:1,name:'张三'},
+                {id:2,name:'李四'},
+                {id:3,name:'王五'},
+            ]
+        },
+        methods:{
+            deleteList(num){
+                //删除
+                this.students = this.students.filter(ele=>ele.id!==num);
+            }
+        }
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>组件通信</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="../vue.js"></script>
+</head>
+<style>
+    .app{
+        display: flex;
+        justify-content: space-between;
+    }
+    .box{
+        width: 30%;
+    }
+</style>
+<body>
+
+<div id="app">
+    <my-btn></my-btn>
+    <my-btn></my-btn>
+    <div class="app">
+        <div class="box">
+            <my-panel></my-panel>
+        </div>
+        <div class="box">
+            <my-panel></my-panel>
+        </div>
+        <div class="box">
+            <my-panel></my-panel>
+        </div>
+    </div>
+</div>
+<!--模板内容多可以放在script标签中  type="text-x-template"-->
+<script type="text-x-template" id="mypanel">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">Panel title</h3>
+        </div>
+        <div class="panel-body">
+            <!--设置自定义属性接受父元素内容，子模板调用父元素的内容
+                title---静态属性    前面加:  是动态属性
+            -->
+            <panel-content title="Panel title" :mes="msg"></panel-content>
+        </div>
+        <div class="panel-footer">
+            {{msg}}
+        </div>
+    </div>
+</script>
+<script type="text-x-template" id="panelconent">
+<table class="table table-striped">
+    <tr>
+        <th>序号 {{title}} {{mes}}</th>
+        <th>姓名</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>zs</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>ls</td>
+    </tr>
+</table>
+</script>
+<script>
+    Vue.component('my-btn',{
+        //接受点击事件  点击让内容变成大写
+        template:"<button class='btn btn-info' @click='toUpperCase'>按钮 {{message}}</button>",
+        data(){
+            return {
+                message:'hello-my-btn'
+            }
+        },
+        methods:{
+            toUpperCase(){
+                // console.log(this.message);
+                this.message = this.message.toUpperCase();
+            }
+        }
+    })
+    //组件中可以写vue中的属性和方法
+    Vue.component('my-panel',{
+        template:"#mypanel",
+        //组件里面的data不能直接写为对象，应该是一个函数
+        data(){
+            return {
+                msg:'hello-my-panel'
+            }
+        },
+        components:{
+            'panel-content':{
+                props:['title','mes'],
+                template: "#panelconent"
+            }
+        }
+    })
+    new Vue({
+        el:'#app',
+        data: {
+
+        }
+    })
+</script>
+</body>
+</html>

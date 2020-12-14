@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cookie存储</title>
+</head>
+<body>
+
+<script>
+    //存储方式
+    document.cookie = 'name=zs';
+    //设置存储时长
+    let date = new Date();
+    date.setFullYear(date.getFullYear() + 1);
+    //date.toUTCString()  转国际标准时间
+    document.cookie = "sex=nan;expires="+date.toUTCString();
+    // console.log(document.cookie);
+    let arr = document.cookie.split('; ');
+    // console.log(arr);
+    cook('sex');
+    //拿到对应的值
+    function cook(attr) {
+        let val;
+        for(let i = 0,len=arr.length; i<len-1; i++){
+            [key,value] = arr[i].split('=');
+            // console.log(key,value)
+            if(key === attr){
+                console.log(value);
+                val = value;
+            }
+        }
+        return val;
+    }
+
+</script>
+</body>
+</html>

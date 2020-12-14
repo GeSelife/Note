@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>router-路由</title>
+    <script src="../vue.js"></script>
+    <script src="../vue-router.js"></script>
+<!--    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>-->
+</head>
+<body>
+<div id="app">
+    <!-- <router-link> 默认会被渲染成一个 `<a>` 标签 -->
+    <router-link to="/index">首页</router-link>
+    <router-link to="/list">列表</router-link>
+    <router-link to="/show/1">展示1</router-link>
+    <router-link to="/show/2">展示2</router-link>
+
+    <p @click="change('/show/3')">展示3</p>
+
+    <!--要将内容渲染在哪里，router-view就放在哪里-->
+    <router-view></router-view>
+</div>
+
+<script>
+    /*
+    多页应用=>单页面应用---只有一页---改变哈希hash值
+       首页、列表、详情页--> 组件
+    如何看到不同的组件
+        url切换不同的页面=>切换不同组件、组件和路由的映射
+        全新页面、iframe（管理端）==>组件显示的位置、组件的位置
+
+    步骤：
+    1.定义组件--页面组件
+    2.组件映射到路由
+    3.实例化路径
+    4.路由实例挂在到根实例vue实例上
+
+    解决路径嵌套太长 : 起名字 name:""  使用的时候to="{name:''}"
+
+    $route  当前被激活的路由
+    $router 通过当前的vue实例找到的VueRouter实例---router实例----this.$router.push()
+
+    redirect:{name:""} 重定向 -- 进入页面进入另一个的地址
+
+ */
+
+    // 1. 定义 (路由) 组件。
+    const Index = { template: '<div>index</div>' }
+    const List = { template: `<div>
+                        <router-link to="/list/sList">学生列表</router-link>
+                        <router-link to="/list/tList">教师列表</router-link>
+
+                        <router-view></router-view>
+                    </div>` }
+    const StudentList = { template: '<div>Student-List</div>' }
+    const TeacherList = { template: '<div>Teacher-List</div>' }
+    const Show = { template: '<div>show</div>' }
+    // 2. 定义路由
+    // 每个路由应该映射一个组件
+    const routes = [
+        { path: '/Index', component: Index},
+        { path: '/List', component: List,redirect: {name:'slits'},
+            children:[
+                { path: '/list/sList', component: StudentList, name:"slits"},
+                { path: '/list/tList', component: TeacherList},
+            ]
+        },
+        { path: '/Show/:id', component: Show },
+    ]
+    // 3. 创建 router 实例，然后传 `routes` 配置
+    const router = new VueRouter({
+        routes // (缩写) 相当于 routes: routes
+    })
+
+    const app = new Vue({
+        el:"#app",
+        router,
+        methods:{
+            change(url){
+                this.$router.push(url)
+            }
+        }
+    })
+</script>
+</body>
+</html>

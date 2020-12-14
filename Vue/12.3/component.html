@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>组件</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="../vue.js"></script>
+</head>
+<body>
+<div id="app">
+{{msg}}
+    <app-all></app-all>
+    <app-all></app-all>
+    <app-all></app-all>
+    <first-com></first-com>
+    <!--在使用的时候大写字母前面要用-连接，并全部转换成小写-->
+    <m-y-v></m-y-v>
+    <table>
+        <!--is特性-->
+        <tr is="m-y-v"></tr>
+    </table>
+</div>
+<div id="app1">
+{{msg}}
+    <app-all></app-all>
+    <app-all></app-all>
+    <app-all></app-all>
+</div>
+
+
+<script>
+    //全局组件
+    Vue.component('app-all',{
+        template:"<button class='btn btn-info'>按钮</button>"
+    })
+    Vue.component('MYV',{
+        template:"<button class='btn btn-danger'>按钮</button>"
+    })
+    // Vue.component('app-all',{
+    //     template:"<button class='btn btn-info'>按钮</button>"
+    // })
+    new Vue({
+        el:'#app',
+        data:{
+            msg:'只是第一个'
+        },
+        //局部组件
+        components:{
+            //标签名
+            'first-com': {
+                template:"<div>第一个里面的组件，我只能在第一个里面</div>"
+            }
+        }
+    })
+    new Vue({
+        el:'#app1',
+        data: {
+            msg:'只是第二个'
+        }
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>vue</title>
+</head>
+<body>
+<input type="text" value="hello vue">
+<h1></h1>
+<script>
+    let inputEle = document.querySelector('input');
+    let hEle = document.querySelector('h1');
+    hEle.innerHTML = inputEle.value.trim();
+    //操作表单 实时监控
+    inputEle.oninput = function () {
+        //更改表单内容让H1标签内容根着改变
+       hEle.innerHTML = this.value.trim();
+    }
+</script>
+</body>
+</html>
